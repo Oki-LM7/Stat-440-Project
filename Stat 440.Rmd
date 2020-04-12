@@ -1,0 +1,87 @@
+---
+title: "Stat 440"
+author: "Group B"
+date: "4/12/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Data  
+The data set we will be using is the Burrito ratings data. This data set contains ratings of about 200 burritos in San Diego from roughly 50 restaurants. The burritos are rated based off of 10 different aspects of the burrito where each is on a scale of 1 to 5.  
+```{r}
+load(file="Burrito/burritodata.Rda")
+```
+
+## Research Question
+A classic San Diego burrito ingredient (so we're told) is potatoes. We will be testing if fries significantly increase the overall rating of a burrito. 
+
+Model 1:
+- Indicator: potato
+- random effect: reviewer, he suggested not using restaurant as a random effect
+
+Model 2:
+- Control for common ingredients, maybe certain types of meat are common to pair with potatoes (confounding - associated with potatoes and the outcome)
+
+## Exploratory Analysis
+```{r}
+## Distribution of reviewers 
+library(ggplot2)
+ggplot(data.frame(burrito$Reviewer), aes(x=burrito$Reviewer)) +
+  geom_bar()
+
+factorBurrito <- as.factor(burrito$Reviewer)
+levels(factorBurrito) #71 reviewers
+
+table(burrito$Reviewer) #many reviewers only appear once
+
+countG1 = 0
+countG5 = 0
+for(i in 1:length(table(burrito$Reviewer))){
+  if(table(burrito$Reviewer)[i] > 1){
+    countG1 <- countG1 + 1
+    if(table(burrito$Reviewer)[i] > 5){
+      countG5 <- countG5 + 1
+      table(burrito$Reviewer)[i]
+    }
+  }else{
+  }
+}
+countG1 ## only 20 reviewers reviewed more than 1 burrito
+countG5 ## only 6 reviewers reviewed more than 5 burritos
+
+##############
+## Potato Data
+##############
+
+library(plyr)
+count(burrito$Fries == 1)
+
+## Potatoes
+potatoData <- burrito[which(burrito$Fries == "1"),]
+factorBurrito2 <- as.factor(potatoData$Reviewer)
+levels(factorBurrito2) #Only 32 reviewers reviewed burritos with potatoes 
+
+## Distribution of reviewers rating burritos with potatoes
+ggplot(data.frame(potatoData$Reviewer), aes(x=potatoData$Reviewer)) +
+  geom_bar()
+
+
+p <- ggplot(data.table(Ingredient=ingredients, Proportion=colMeans(potatoData[,ingredients]))) + geom_point(aes(x=Ingredient, y=Proportion))
+p <- p +  theme(axis.text.x = element_text(angle=45, vjust=1, hjust=1))
+p <- p + ylim(0,1)
+print(p) ## Common ingredients with potatoes: Beef, Cheese, Guac, Pico, Sour Cream (Possibly Sauce)
+
+## Distribution of Reviews
+ggplot(data.frame(burrito$overall), aes(x=burrito$overall)) +
+  geom_bar()
+
+## Distribution of Reviews for burritos with Potatoes 
+ggplot(data.frame(potatoData$overall), aes(x=potatoData$overall)) +
+  geom_bar() + xlim(0, 5)
+```
+
+## Cleaning our data
+To start, we removed unnecessary variables for our analysis which included location, cost, hunger, length, circumference, volume, and all of the rating variables besides overall rating. We also cleaned our data to get rid of any NAs. We are left with the variables reviewer and the 33 ingredients. 
