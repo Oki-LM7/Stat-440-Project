@@ -68,7 +68,6 @@ levels(factorBurrito2) #Only 32 reviewers reviewed burritos with potatoes
 ggplot(data.frame(potatoData$Reviewer), aes(x=potatoData$Reviewer)) +
   geom_bar()
 
-
 p <- ggplot(data.table(Ingredient=ingredients, Proportion=colMeans(potatoData[,ingredients]))) + geom_point(aes(x=Ingredient, y=Proportion))
 p <- p +  theme(axis.text.x = element_text(angle=45, vjust=1, hjust=1))
 p <- p + ylim(0,1)
