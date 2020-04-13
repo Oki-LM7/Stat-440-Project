@@ -22,8 +22,35 @@ Model 1:
 - Indicator: potato
 - random effect: reviewer, he suggested not using restaurant as a random effect
 
+Y = Overall rating 
+$X_{1}$= Potatoes
+$X_{2}$ = Reviewer
+
 Model 2:
 - Control for common ingredients, maybe certain types of meat are common to pair with potatoes (confounding - associated with potatoes and the outcome)
+
+Y = Overall rating
+$X_{1}$ = Potatoes
+$X_{2}$ = Beef
+$X_{3}$ = Cheese
+$X_{4}$ = Guac
+$X_{5}$ = Pico
+
+
+$$Y|\beta, \sigma^{-2} \sim MVN(\textbf{X}\beta,\sigma^{-2}\textbf{I})$$
+
+$$\beta \sim MVN(\mu,\tau^{2}\textbf{I})$$
+
+$$\sigma^{-2} \sim Gamma(a,b)$$
+
+
+
+
+
+
+
+
+
 
 ## Exploratory Analysis
 ```{r}
