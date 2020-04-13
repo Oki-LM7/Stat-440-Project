@@ -1,6 +1,6 @@
 ---
 title: "Stat 440"
-author: "Group B"
+author: "Group B: Matthew Bayley , Oki Ogbe, Sabrina Pribly"
 date: "4/12/2020"
 output: html_document
 ---
