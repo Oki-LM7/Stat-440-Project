@@ -1,8 +1,10 @@
 ---
-title: "Stat 440"
-author: "Group B: Matthew Bayley , Oki Ogbe, Sabrina Pribly"
+title: "Stat 440 Project Proposal"
+author: 'Group B: Matthew Bayley , Oki Ogbe, Sabrina Pribyl'
 date: "4/12/2020"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -12,7 +14,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Data  
 The data set we will be using is the Burrito ratings data. This data set contains ratings of about 200 burritos in San Diego from roughly 50 restaurants. The burritos are rated based off of 10 different aspects of the burrito where each is on a scale of 1 to 5.  
 ```{r}
-load(file="Burrito/burritodata.Rda")
+#load(file="Burrito/burritodata.Rda")
+load("/cloud/project/burritodata.Rda")
 ```
 
 ## Research Question
@@ -40,15 +43,15 @@ $X_{5}$ = Pico
 $$Y|\beta, \sigma^{-2} \sim MVN(\textbf{X}\beta,\sigma^{-2}\textbf{I})$$
 
 $$\beta \sim MVN(\mu,\tau^{2}\textbf{I})$$
-```{r}
+```{r, include=FALSE}
 
 mu = mean(burrito$overall, na.rm = T)
 tau2 = var(burrito$overall, na.rm = T)
 ```
 
-$\mu$ = 3.537
+$$\mu = 3.537$$
 
-$\tau^{2}$ = 0.681
+$$\tau^{2} = 0.681$$
 
 $$\sigma^{-2} \sim Gamma(a,b)$$
 
@@ -107,7 +110,7 @@ levels(factorBurrito2) #Only 32 reviewers reviewed burritos with potatoes
 ggplot(data.frame(potatoData$Reviewer), aes(x=potatoData$Reviewer)) +
   geom_bar()
 
-p <- ggplot(data.table(Ingredient=ingredients, Proportion=colMeans(potatoData[,ingredients]))) + geom_point(aes(x=Ingredient, y=Proportion))
+p <- ggplot(data.frame(Ingredient=ingredients, Proportion=colMeans(potatoData[,ingredients]))) + geom_point(aes(x=Ingredient, y=Proportion))
 p <- p +  theme(axis.text.x = element_text(angle=45, vjust=1, hjust=1))
 p <- p + ylim(0,1)
 print(p) ## Common ingredients with potatoes: Beef, Cheese, Guac, Pico, Sour Cream (Possibly Sauce)
