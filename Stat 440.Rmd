@@ -40,16 +40,21 @@ $X_{5}$ = Pico
 $$Y|\beta, \sigma^{-2} \sim MVN(\textbf{X}\beta,\sigma^{-2}\textbf{I})$$
 
 $$\beta \sim MVN(\mu,\tau^{2}\textbf{I})$$
+```{r}
+mu = mean(burrito$overall)
+tau2 = var(burrito$overall)
+```
 
-$\mu$ = mean
+$\mu$ = 
 
+$\tau^{2}$ =
 
 $$\sigma^{-2} \sim Gamma(a,b)$$
 
 
 
 a = .1
-b =.1
+b = .1
 
 
 
