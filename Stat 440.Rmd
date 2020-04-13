@@ -41,9 +41,15 @@ $$Y|\beta, \sigma^{-2} \sim MVN(\textbf{X}\beta,\sigma^{-2}\textbf{I})$$
 
 $$\beta \sim MVN(\mu,\tau^{2}\textbf{I})$$
 
+$\mu$ = mean
+
+
 $$\sigma^{-2} \sim Gamma(a,b)$$
 
 
+
+a = .1
+b =.1
 
 
 
