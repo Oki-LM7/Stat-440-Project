@@ -1,0 +1,118 @@
+---
+title: "Stat 440 Draft"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+
+load("/cloud/project/burritodata.Rda")
+
+
+
+library(tidyverse)
+
+
+burrito = burrito[!is.na(burrito$overall),]
+
+x <- burrito %>% select(Fries,Reviewer) %>% as.matrix()
+x[,2] = as.factor(x[,2])
+x = apply(x, 2, as.numeric)
+
+#x = as.numeric(x)
+
+y = burrito$overall
+
+```
+
+```{r}
+# mixed effects model Gibbs Sampler
+# uses the burrito dataset
+
+Mixedmod <- function(y,x,Reviewer,S,burin, a, b, mu0, tau2){
+Z= model.matrix(~as.factor(Reviewer)-1, data= burrito)
+W = cbind(1,x,Z)
+q = ncol(Z)
+p <- ncol(W)- q
+n <- nrow(W)
+## place to store posterior
+beta_keep <- matrix(NA, S, p)
+gamma_keep <- matrix(NA, S, q)
+sig2inv_keep <- rep(NA,S)
+kappa2inv_keep <- rep(NA,S)
+## pre-calculations
+WW <- t(W)%*%W
+Wy <- t(W)%*%y
+## starting values
+beta <- rnorm(p)
+gamma = rnorm(q)
+theta = c(beta,gamma)
+sig2inv <- 1
+kappa2inv <- 1
+sigmaDiag = c(0,rep(1/tau2, p-1), rep(kappa2inv,q))
+## MCMC
+for(s in 1:S){
+### update beta from full conditional
+#variance
+v <- WW*sig2inv
+sigmaDiag[(p+1):(p+q)] = kappa2inv
+diag(v) <- diag(v) + sigmaDiag
+v <- chol2inv(chol(v))
+#mean
+m <- v %*% (sig2inv*Wy)
+# simulate from FC
+theta <- drop(m + t(chol(v)) %*% rnorm(p+q))
+5
+### update sig2inv from full conditional
+sig2inv <- rgamma(1, a + n/2, b + 0.5*sum((y-W%*%theta)^2))
+### update sig2inv from full conditional
+kappa2inv <- rgamma(1, a + q/2, b + 0.5*sum(gamma^2))
+### store output
+sig2inv_keep[s] <- sig2inv
+kappa2inv_keep[s] <- kappa2inv
+beta_keep[s,] <- theta[1:p]
+gamma_keep[s,] <- theta[(p+1):(p+q)]
+}
+## summarize posterior
+post_table <- data.frame(
+mean=colMeans(beta_keep[-c(1:burnin),]),
+sd=apply(beta_keep[-c(1:burnin),],2,sd),
+lower=apply(beta_keep[-c(1:burnin),],2,quantile, 0.025),
+upper=apply(beta_keep[-c(1:burnin),],2, quantile, 0.975))
+#rownames(post_table) <- c("Intercept",colnames(X)[-1])
+vc = cbind(1/sig2inv, 1/kappa2inv, ICC = (1/kappa2inv) /(1/kappa2inv+1/sig2inv) )
+varcomp <- data.frame(
+mean=colMeans(vc[-c(1:burnin),]),
+sd=apply(vc[-c(1:burnin),],2,sd),
+lower=apply(vc[-c(1:burnin),],2,quantile, 0.025),
+upper=apply(vc[-c(1:burnin),],2, quantile, 0.975))
+return(list(sigma=1/sqrt(sig2inv_keep),
+kappa=1/sqrt(kappa2inv_keep),
+beta=beta_keep,
+gamma= gamma_keep,
+table=post_table,
+varcomp))
+}
+```
+
+```{r}
+
+# mixed model results
+# uses the burrito dataset
+
+a = .1
+b = .1
+Reviewer = burrito$Reviewer
+mu0 = mean(burrito$overall, na.rm = T)
+tau2 = var(burrito$overall,na.rm = T)
+S = 2000
+burnin = 500
+
+mixedResults =  Mixedmod(y,x,Reviewer,S,burnin,a,b,mu0,tau2)
+
+```
+
