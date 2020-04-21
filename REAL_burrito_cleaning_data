@@ -1,0 +1,23 @@
+##Load data, name: burrito
+#load(file = "Burrito/burritodata.Rda")
+
+##Delete useless variables
+#burrito$Location = NULL
+#burrito$Cost = NULL
+#burrito$Hunger = NULL
+#burrito$Cost = NULL
+#burrito$Length = NULL
+#burrito$Circum = NULL
+#burrito$Volume = NULL
+#burrito$Tortilla = NULL
+#burrito$Temp = NULL
+#burrito$Meat = NULL
+#burrito$Fillings = NULL
+#burrito$Meat_filling = NULL
+#burrito$Uniformity = NULL
+#burrito$Salsa = NULL
+#burrito$Synergy = NULL
+#burrito$Wrap = NULL
+
+##Delete incomplete rows
+#burrito = burrito[-c(173:174),]
