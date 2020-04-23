@@ -3,8 +3,8 @@ title: "Stat 440 Project Proposal"
 author: 'Group B: Matthew Bayley , Oki Ogbe, Sabrina Pribyl'
 date: "4/12/2020"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -72,7 +72,10 @@ b = .1
 ## Distribution of reviewers 
 library(ggplot2)
 ggplot(data.frame(burrito$Reviewer), aes(x=burrito$Reviewer)) +
-  geom_bar()
+  geom_bar() + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
+  ggtitle("Distribution Reviewers") + 
+  theme(plot.title = element_text(hjust = 0.5)) +
+  xlab("Reviewer") + ylab("Number of Reviews") 
 
 factorBurrito <- as.factor(burrito$Reviewer)
 levels(factorBurrito) #71 reviewers
@@ -103,25 +106,48 @@ count(burrito$Fries == 1)
 
 ## Potatoes
 potatoData <- burrito[which(burrito$Fries == "1"),]
+potatoData <- potatoData[complete.cases(potatoData), ]
 factorBurrito2 <- as.factor(potatoData$Reviewer)
 levels(factorBurrito2) #Only 32 reviewers reviewed burritos with potatoes 
 
 ## Distribution of reviewers rating burritos with potatoes
 ggplot(data.frame(potatoData$Reviewer), aes(x=potatoData$Reviewer)) +
-  geom_bar()
+  geom_bar() + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
+  ggtitle("Distribution Reviewers Rating Burritos With Potatoes") + 
+  theme(plot.title = element_text(hjust = 0.5)) +
+  xlab("Reviewer") + ylab("Number of Reviews") 
 
-p <- ggplot(data.frame(Ingredient=ingredients, Proportion=colMeans(potatoData[,ingredients]))) + geom_point(aes(x=Ingredient, y=Proportion))
+
+
+p <- ggplot(data.frame(Ingredient=ingredients, Proportion=colMeans(potatoData[,ingredients]))) + geom_point(aes(x=Ingredient, y=Proportion, colour = Proportion>.4)) + 
+  ggtitle("Common Ingredients With Potatoes") + 
+  theme(plot.title = element_text(hjust = 0.5)) 
 p <- p +  theme(axis.text.x = element_text(angle=45, vjust=1, hjust=1))
 p <- p + ylim(0,1)
 print(p) ## Common ingredients with potatoes: Beef, Cheese, Guac, Pico, Sour Cream (Possibly Sauce)
 
+
 ## Distribution of Reviews
+Mean <- mean(burrito$overall)
+burrito$overall
+
 ggplot(data.frame(burrito$overall), aes(x=burrito$overall)) +
-  geom_bar()
+  geom_bar() + ggtitle("Distribution of Overall Rating") + 
+  theme(plot.title = element_text(hjust = 0.5)) +
+  xlab("Overall Rating") + ylab("Count") +
+  geom_vline(xintercept = MeanPotato, col = 2)
 
 ## Distribution of Reviews for burritos with Potatoes 
+MeanPotato <- mean(potatoData$overall)
+MeanPotato
+
 ggplot(data.frame(potatoData$overall), aes(x=potatoData$overall)) +
-  geom_bar() + xlim(0, 5)
+  geom_bar() + xlim(1, 5) + ggtitle("Distribution of Overall Rating for Burritos with Potatoes") + 
+  theme(plot.title = element_text(hjust = 0.5)) +
+  xlab("Overall Rating") + ylab("Count") +
+  geom_vline(xintercept = MeanPotato, col = 2)
+
+
 ```
 
 ## Cleaning our data
