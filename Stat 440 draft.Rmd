@@ -144,7 +144,7 @@ plot(beta_1, type="l")
 # model 2 fixedmodel
 
 
-fixedmod <- function(y,x,S,burin, a, b, mu0, tau2){
+fixedmod <- function(y,x,S,burnin, a, b, mu0, tau2){
   
   X <- cbind(1,x)
   p <- ncol(X)
@@ -211,6 +211,32 @@ return(list(sigma=1/sqrt(sig2inv_keep),
             beta=beta_keep, 
             table=post_table))
 }
+
+```
+
+```{r}
+#fixed model results
+
+
+ x = burrito %>%
+     select(-"overall" )
+# make x a numeric matrix
+x$Reviewer = match(x$Reviewer, unique(x$Reviewer))
+
+x = as.matrix(x)
+
+y = burrito$overall
+
+mu0 =0
+tau2 =100
+a = .1
+b =.1
+S = 5000
+burnin = 2000 
+
+# run fixed model
+
+fixedmod(y,x,S,burnin, a, b, mu0, tau2)
 
 ```
 
