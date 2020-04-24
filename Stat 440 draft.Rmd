@@ -40,7 +40,7 @@ lm(overall ~ Fries, data= burrito)
 
 ```{r}
 
-#Model 1 mixed model and ICC results
+#Model 1 mixed model with only 1 ingredi and ICC results
 set.seed(123455)
 BLMM <- function(y,x,group,S,burnin, a1=0.01, a2=0.01, b1=0.01, b2=0.01, tau2=100){
   
@@ -130,7 +130,7 @@ for(i in 1:30){
 ```
 
 ```{r}
-# mixed model posterior summary
+# model 1 posterior summary
 
 fit$varcomp
 fit$table
@@ -139,105 +139,33 @@ plot(beta_1, type="l")
 ```
 
 
+
+
 ```{r}
 
-# model 2 fixedmodel
+# Model 2, mixed model with all ingredients
 
+# add all ingredients into the design matrix design matrix
 
-fixedmod <- function(y,x,S,burnin, a, b, mu0, tau2){
-  
-  X <- cbind(1,x)
-  p <- ncol(X)
-  n <- nrow(X)
-  
-  
-  
-  
-  ## place to store posterior
-  
-  beta_keep <- matrix(NA, S, p)
-  sig2inv_keep <- rep(NA,S)
-  
-  ## pre-calculations
-  
-  XX <- t(X)%*%X
-  Xy <- t(X)%*%y
-  mu0tau2 <- mu0/tau2
-  
-  ## starting values
-  
-  beta <- rnorm(p)
-  sig2inv <- 1
-  
-  ## MCMC
-  
-  for(s in 1:S){
-    ### update beta from full conditional
-    
-    #variance
-    v <- XX*sig2inv 
-    diag(v) <- diag(v) + 1/tau2
-    v <- chol2inv(chol(v))
-    
-    #mean
-    m <- v %*% (sig2inv*Xy + mu0tau2)
-    
-    # simulate from FC
-    beta <- drop(m +  t(chol(v)) %*% rnorm(p))
-    
-    ### update sig2inv from full conditional
-    sig2inv <- rgamma(1, a + n/2,  b + 0.5*sum((y-X%*%beta)^2))
-    
-    
-    ### store output
-    sig2inv_keep[s] <- sig2inv
-    beta_keep[s,] <- beta
-    
-  }
-  
-  
-## summarize posterior
+x = burrito %>%
+    select(-c("Reviewer", "overall")) %>%
+    as.matrix()
 
-post_table <- data.frame(
-  mean=colMeans(beta_keep[-c(1:burnin),]),
-  sd=apply(beta_keep[-c(1:burnin),],2,sd),
-  lower=apply(beta_keep[-c(1:burnin),],2,quantile, 0.025),
-  upper=apply(beta_keep[-c(1:burnin),],2, quantile, 0.975))
+# run model 2
 
-#rownames(post_table) <- c("Intercept",colnames(X)[-1])
+mod2fit = BLMM(burrito$overall, x, group=burrito$Reviewer, 5000, 2000)
+hist(fit$random)
 
-
-return(list(sigma=1/sqrt(sig2inv_keep), 
-            beta=beta_keep, 
-            table=post_table))
-}
 
 ```
 
 ```{r}
-#fixed model results
 
+# model 2 posterior summary
 
- x = burrito %>%
-     select(-"overall" )
-# make x a numeric matrix
-x$Reviewer = match(x$Reviewer, unique(x$Reviewer))
-
-x = as.matrix(x)
-
-y = burrito$overall
-
-mu0 =0
-tau2 =100
-a = .1
-b =.1
-S = 5000
-burnin = 2000 
-
-# run fixed model
-
-fixedmod(y,x,S,burnin, a, b, mu0, tau2)
-
+mod2fit$varcomp
+mod2fit$table
+beta_1 = mod2fit$beta[,2]
+plot(beta_1, type="l")
 ```
-
 
