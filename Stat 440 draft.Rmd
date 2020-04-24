@@ -165,7 +165,8 @@ hist(fit$random)
 
 mod2fit$varcomp
 mod2fit$table
-beta_1 = mod2fit$beta[,2]
-plot(beta_1, type="l")
+beta_1 = mod2fit$beta[6,2]
+#plot(beta_1, type="l")
+
 ```
 
